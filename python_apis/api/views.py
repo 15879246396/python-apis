@@ -17,7 +17,7 @@ from api.utils import convert_pdf_to_jpg, matchImg, cut_img, ocr_look_result
 @csrf_exempt
 @api_view(['POST'])
 @parser_classes((JSONParser, MultiPartParser,))
-def files_ocr(request):
+def files_ocrs(request):
     data = request.data
     file_type = data.get("file_type")
     file = request.FILES.get('file')
