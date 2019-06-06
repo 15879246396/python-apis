@@ -47,6 +47,9 @@ def cut_img(img_src, coordinate):
 
 def ocr_look_result(image, language_type='ENG'):
     image_name, image_io = image['name'], image['file']
+    if not image_io:
+        data = (image_name, '')
+        return data
     image_data = image_io.getvalue()
     base64_ima = str(base64.b64encode(image_data)).replace("b'", "").replace("'", "")
     data = {

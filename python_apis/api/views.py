@@ -17,7 +17,7 @@ from api.utils import convert_pdf_to_jpg, matchImg, cut_img, ocr_look_result
 @parser_classes((JSONParser, MultiPartParser,))
 def files_ocr(request):
     data = request.data
-    file_type = data.get("file_type", 2)
+    file_type = data.get("file_type")
     file = request.FILES.get('file')
     if not all((file, file_type)):
         return Response({"data": 'params error', "code": 0})
@@ -49,6 +49,9 @@ def files_ocr(request):
             pdf_file = zip_file.read(pdf)
         png_io = convert_pdf_to_jpg(pdf_file)
         match_result = matchImg(png_io.getvalue(), template, 0.5)
+        if not match_result:
+            png_list.append({'name': pdf.filename, "file": 0})
+            continue
         rectangle = match_result['rectangle']
         x, y = rectangle[0]
         w, h = rectangle[-1]
@@ -57,6 +60,7 @@ def files_ocr(request):
         png_list.append({'name': pdf.filename, "file": out_img})
 
     results = {}
+    data = {}
 
     def callback(_, d):
         results[d[0]] = d[1].replace(' ', '')
@@ -71,17 +75,17 @@ def files_ocr(request):
             value = results[k]
             r = re.findall(r'([A-Z]{2}\d{5})', k)
             if r:
-                del results[k]
                 k = r[0]
+                data[k] = value
             r = re.findall(r'([A-Z]{2}\d+)', value)
             if r:
-                results[k] = r[0]
+                data[k] = r[0]
     else:
         for k in results:
             value = results[k]
+            data[k] = value
             r = re.findall(r'([A-Z]{2}\d{5})', k)
             if r:
-                del results[k]
                 k = r[0]
-                results[k] = value
-    return Response({"data": results, "code": 1})
+                data[k] = value
+    return Response({"data": data, "code": 1})
