@@ -17,7 +17,7 @@ from api.utils import convert_pdf_to_jpg, matchImg, cut_img, ocr_look_result
 @parser_classes((JSONParser, MultiPartParser,))
 def files_ocr(request):
     data = request.data
-    file_type = data.get("file_type")
+    file_type = int(data.get("file_type"))
     file = request.FILES.get('file')
     if not all((file, file_type)):
         return Response({"data": 'params error', "code": 0})
