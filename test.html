@@ -7,8 +7,9 @@
 <body>
     <div style="margin-top: 50px;margin-left: 100px">
         <h1>TEST</h1>
-        <form action="http://47.112.126.125:8198/api/files_ocr/" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="file_type" value="2" />
+        <form action="http://0.0.0.0:8000/api/files_ocr/" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="file_type" value="3" />
+            <input type="hidden" name="site_id" value="1" />
             <input type="file" name="file" />
             <input type="submit" value="上传文件" />
         </form>

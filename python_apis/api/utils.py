@@ -11,10 +11,20 @@ from io import BytesIO
 from PIL import Image, ImageEnhance
 
 
-def convert_pdf_to_jpg(pdf_stream):
-    doc = fitz.open('type', pdf_stream)
-    page = doc[0]
-    zoom = int(100)
+def convert_pdf_to_jpg(pdf_stream, p=0, zoom=100):
+    """
+    PDF转图片
+    :param pdf_stream: pdf IO
+    :param p         : 将PDF的第几页转图
+    :return          : 图片 IO
+    :param zoom      : 清晰度
+    """
+    try:
+        doc = fitz.open('type', pdf_stream)
+    except RuntimeError:
+        return None
+    page = doc[p]
+    zoom = int(zoom)
     rotate = int(0)
     trans = fitz.Matrix(zoom / 100.0, zoom / 100.0).preRotate(rotate)
     pm = page.getPixmap(matrix=trans, alpha=False)
@@ -45,27 +55,29 @@ def cut_img(img_src, coordinate):
     return img_io
 
 
-def ocr_look_result(image, language_type='ENG'):
-    image_name, image_io = image['name'], image['file']
-    if not image_io:
-        data = (image_name, '')
-        return data
-    image_data = image_io.getvalue()
-    base64_ima = str(base64.b64encode(image_data)).replace("b'", "").replace("'", "")
-    data = {
-        'image': base64_ima,
-        "language_type": language_type
-    }
-    headers = {
-        'Authorization': 'APPCODE aa27272bbda7484f8593b9d6e44bba18',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'detect_direction': 'false',
-        'detect_language': 'false',
-        'probability': 'false'
-    }
-    url = "http://wenzi.market.alicloudapi.com/do"
-    result = requests.post(url, data=data, headers=headers, verify=False, timeout=15).json()
-    if 'words_result' in result:
-        data = (image_name, result['words_result'][0]['words'])
-        return data
+def ocr_look_result(image, language_type='CHN_ENG'):
+    image_name, image_ios = image['name'], image['file']
+    if not image_ios:
+        orc_data = [image_name, '', '', '']
+        return orc_data
+    orc_data = [image_name]
+    for image_io in image_ios:
+        image_data = image_io.getvalue()
+        base64_ima = str(base64.b64encode(image_data)).replace("b'", "").replace("'", "")
+        data = {
+            'image': base64_ima,
+            "language_type": language_type
+        }
+        headers = {
+            'Authorization': 'APPCODE aa27272bbda7484f8593b9d6e44bba18',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'detect_direction': 'false',
+            'detect_language': 'false',
+            'probability': 'false'
+        }
+        url = "http://wenzi.market.alicloudapi.com/do"
+        result = requests.post(url, data=data, headers=headers, verify=False, timeout=15).json()
+        if 'words_result' in result:
+            orc_data.append(result['words_result'][0]['words'])
+    return orc_data
 
