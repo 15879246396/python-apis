@@ -33,7 +33,7 @@ def convert_pdf_to_jpg(pdf_stream, p=0, zoom=100):
     return png_io
 
 
-def matchImg(src, img_obj, confidence=0.2):  # imgsrc=原始图像，imgobj=待查找的图片
+def matchImg(src, img_obj, confidence=0.5):  # imgsrc=原始图像，imgobj=待查找的图片
     img_obj = aircv.imread(img_obj)
     imgsrcNPArray = numpy.fromstring(src, numpy.uint8)
     img_src = cv2.imdecode(imgsrcNPArray, cv2.IMREAD_COLOR)
@@ -55,7 +55,7 @@ def cut_img(img_src, coordinate):
     return img_io
 
 
-def ocr_look_result(image, language_type='CHN_ENG'):
+def ocr_look_result(image, language_type='ENG'):
     image_name, image_ios = image['name'], image['file']
     if not image_ios:
         orc_data = [image_name, '', '', '']
@@ -63,6 +63,8 @@ def ocr_look_result(image, language_type='CHN_ENG'):
     orc_data = [image_name]
     for image_io in image_ios:
         image_data = image_io.getvalue()
+        with open("11111.png", 'wb') as f:
+            f.write(image_data)
         base64_ima = str(base64.b64encode(image_data)).replace("b'", "").replace("'", "")
         data = {
             'image': base64_ima,
@@ -77,7 +79,19 @@ def ocr_look_result(image, language_type='CHN_ENG'):
         }
         url = "http://wenzi.market.alicloudapi.com/do"
         result = requests.post(url, data=data, headers=headers, verify=False, timeout=15).json()
-        if 'words_result' in result:
+        if result['words_result_num'] > 0:
             orc_data.append(result['words_result'][0]['words'])
     return orc_data
 
+
+def convert_pdf_to_txt(pdf_stream, p=0):
+    try:
+        doc = fitz.open('type', pdf_stream)
+    except RuntimeError:
+        return None
+    try:
+        page = doc[p]
+    except IndexError:
+        page = doc[-1]
+    text = page.getText()
+    return text
