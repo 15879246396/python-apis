@@ -73,10 +73,6 @@ def files_ocr(request):
     elif site_id == "5":
         if file_type not in ["1"]:
             return Response({"data": 'file_type format error', "code": 0})
-        template_1 = "./files/templates/{}-{}_1.png".format(site_id, file_type)
-        template_2 = "./files/templates/{}-{}_2.png".format(site_id, file_type)
-        template_3 = "./files/templates/{}-{}_3.png".format(site_id, file_type)
-        templates = [template_1, template_2, template_3]
     else:
         return Response({"data": 'site_id format error', "code": 0})
 
@@ -117,9 +113,9 @@ def files_ocr(request):
                 pdf_info["date_2"] = r[0].replace("\n", ' ')
 
             data[file_no] = pdf_info
-        return Response(data)
+        return Response({"data": data, "code": 1})
 
-    elif site_id == "4" and file_type == "1":
+    elif site_id == "4" and file_type in ["1", "2"]:
         data = {}
         for pdf in compress_list:
             pdf_info = {
@@ -149,7 +145,7 @@ def files_ocr(request):
                 pdf_info["tax_no"] = r[0].replace(" ", '').replace("\n", '')
 
             data[file_no] = pdf_info
-        return Response(data)
+        return Response({"data": data, "code": 1})
 
     png_list = []
     data = {}

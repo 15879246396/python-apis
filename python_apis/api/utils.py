@@ -63,8 +63,6 @@ def ocr_look_result(image, language_type='ENG'):
     orc_data = [image_name]
     for image_io in image_ios:
         image_data = image_io.getvalue()
-        with open("11111.png", 'wb') as f:
-            f.write(image_data)
         base64_ima = str(base64.b64encode(image_data)).replace("b'", "").replace("'", "")
         data = {
             'image': base64_ima,
