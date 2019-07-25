@@ -21,11 +21,11 @@ sys.setdefaultencoding('utf-8')
 @parser_classes((JSONParser, MultiPartParser,))
 def files_ocr(request):
     """
-                     1          2         3      4
+                     1          2         3      4        5
         1    德国  ：VAT、      EORI 、   报税号、 临时税号
         2    法国  ：VAT
-        3    西班牙：VAT、      本地税号
-        4    意大利：VAT_VIES、 VAT_temp 、 EORI
+        3    西班牙：VAT、                                本地税号
+        4    意大利：VAT_VIES、 EORI
         5    英国  ：VAT
 
     """
@@ -61,12 +61,12 @@ def files_ocr(request):
         template_2 = "./files/templates/{}-{}_2.png".format(site_id, file_type)
         templates = [template_1, template_2]
     elif site_id == "3":
-        if file_type not in ["1", "2"]:
+        if file_type not in ["1", "5"]:
             return Response({"data": 'file_type format error', "code": 0})
         template = "./files/templates/{}-{}.png".format(site_id, file_type)
         templates = [template]
     elif site_id == "4":
-        if file_type not in ["1", "2", "3"]:
+        if file_type not in ["1", "2"]:
             return Response({"data": 'file_type format error', "code": 0})
         template = "./files/templates/{}-{}.png".format(site_id, file_type)
         templates = [template]
@@ -115,7 +115,7 @@ def files_ocr(request):
             data[file_no] = pdf_info
         return Response({"data": data, "code": 1})
 
-    elif site_id == "4" and file_type in ["1", "2"]:
+    elif site_id == "4" and file_type in ["1"]:
         data = {}
         for pdf in compress_list:
             pdf_info = {
