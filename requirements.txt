@@ -1,4 +1,4 @@
-Django==1.8.4
+Django==2.2.24
 djangorestframework==3.2.3
 djangorestframework-csv==2.1.0
 Pillow==3.0.0
